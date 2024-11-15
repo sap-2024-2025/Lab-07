@@ -1,0 +1,33 @@
+name: pixelart
+
+services:
+  registry:
+    image: pixelart-registry
+    container_name: registry-01
+    networks:
+      - pixelart_network
+    ports:
+      - "9000:9000"
+    expose: 
+      - 9000
+    healthcheck:
+      test: curl --fail http://registry:9000/health || exit 1
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+  grid:
+    image: pixelart-grid
+    container_name: my-grid-01
+    depends_on:
+      registry:
+        condition: service_healthy
+    networks:
+      - pixelart_network
+    ports:
+      - "9100:9100"
+    expose: 
+      - 9100
+networks:
+  pixelart_network:
